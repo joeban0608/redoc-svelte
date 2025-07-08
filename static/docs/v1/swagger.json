@@ -117,18 +117,14 @@
 						"description": "A list of memories with pagination information."
 					}
 				},
-				"security": [{ "localhost:5173": ["write:pets", "read:pets"] }]	
+				"security": [
+					{ "api_key": [] }
+				]
 			}
 		}
 	},
 	"securityDefinitions": {
-		"api_key": { "type": "apiKey", "name": "api_key", "in": "header" },
-		"localhost:5173": {
-			"type": "apiKey",
-			"authorizationUrl": "http://localhost:5173/signin",
-			"flow": "implicit",
-			"scopes": { "read:pets": "read your pets", "write:pets": "modify pets in your account" }
-		}
+		"api_key": { "type": "apiKey", "name": "X-API-KEY", "in": "header" }
 	},
 	"definitions": {
 		"ApiResponse": {
