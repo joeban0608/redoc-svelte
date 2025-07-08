@@ -1,4 +1,7 @@
-# sv
+# purpose 
+- use npm redoc to render api docs in svelte
+
+## sv
 
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
