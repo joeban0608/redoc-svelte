@@ -1,0 +1,215 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"description": "This is a sample server Pageyai server. For this sample, you can use the api key `special-key` to test the authorization filters.",
+		"version": "0.0.1",
+		"title": "Pageyai Documentation",
+		"termsOfService": "http://localhost:5173/docs/term-of-service",
+		"contact": { "email": "jow@wows.ai" },
+		"license": { "name": "Apache 2.0", "url": "http://www.apache.org/licenses/LICENSE-2.0.html" }
+	},
+	"host": "localhost:5173",
+	"basePath": "/api",
+	"tags": [
+		{
+			"name": "memory",
+			"description": "Let AI remember your important info and moments."
+		}
+	],
+	"schemes": ["https", "http"],
+	"paths": {
+		"/memory": {
+			"get": {
+				"tags": ["memory"],
+				"summary": "retrieve memories",
+				"description": "Fetches a list of memories, which are pieces of knowledge or information stored for future reference.",
+				"operationId": "getMemories",
+				"consumes": ["application/json"],
+				"produces": ["application/json"],
+				"parameters": [
+					{
+						"name": "page",
+						"in": "query",
+						"description": "The page number for pagination, optional. Must be greater than 0.",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"minimum": 1,
+							"example": 1
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"description": "The maximum number of items per page, optional. Min: 1, Max: 100 (default: 25)",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"minimum": 1,
+							"maximum": 100,
+							"default": 25,
+							"example": 20
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"schema": {
+							"type": "object",
+							"properties": {
+								"pagination": {
+									"type": "object",
+									"properties": {
+										"page": {
+											"type": "integer",
+											"description": "The current page number."
+										},
+										"limit": {
+											"type": "integer",
+											"description": "The number of items per page."
+										},
+										"total": {
+											"type": "integer",
+											"description": "The total number of items."
+										}
+									},
+									"required": ["page", "limit", "total"]
+								},
+								"items": {
+									"type": "array",
+									"description": "An array of memory objects.",
+									"items": {
+										"type": "object",
+										"properties": {
+											"id": {
+												"type": "string",
+												"description": "The unique identifier of the memory."
+											},
+											"createdAt": {
+												"type": "string",
+												"format": "date-time",
+												"description": "The date when the memory was created."
+											},
+											"updatedAt": {
+												"type": "string",
+												"format": "date-time",
+												"description": "The date when the memory was last updated."
+											},
+											"shortCode": {
+												"type": "string",
+												"description": "The short code of this memory."
+											},
+											"content": {
+												"type": "string",
+												"description": "The content or knowledge stored in the memory."
+											},
+											"category": {
+												"type": "string",
+												"description": "The category of the memory."
+											}
+										},
+										"required": ["id", "createdAt", "updatedAt", "shortCode", "content", "category"]
+									}
+								}
+							},
+							"required": ["pagination", "items"]
+						},
+						"description": "A list of memories with pagination information."
+					}
+				},
+				"security": [{ "localhost:5173": ["write:pets", "read:pets"] }]	
+			}
+		}
+	},
+	"securityDefinitions": {
+		"api_key": { "type": "apiKey", "name": "api_key", "in": "header" },
+		"localhost:5173": {
+			"type": "apiKey",
+			"authorizationUrl": "http://localhost:5173/signin",
+			"flow": "implicit",
+			"scopes": { "read:pets": "read your pets", "write:pets": "modify pets in your account" }
+		}
+	},
+	"definitions": {
+		"ApiResponse": {
+			"type": "object",
+			"properties": {
+				"code": { "type": "integer", "format": "int32" },
+				"type": { "type": "string" },
+				"message": { "type": "string" }
+			}
+		},
+		"Category": {
+			"type": "object",
+			"properties": {
+				"id": { "type": "integer", "format": "int64" },
+				"name": { "type": "string" }
+			},
+			"xml": { "name": "Category" }
+		},
+		"Pet": {
+			"type": "object",
+			"required": ["name", "photoUrls"],
+			"properties": {
+				"id": { "type": "integer", "format": "int64" },
+				"category": { "$ref": "#/definitions/Category" },
+				"name": { "type": "string", "example": "doggie" },
+				"photoUrls": {
+					"type": "array",
+					"xml": { "wrapped": true },
+					"items": { "type": "string", "xml": { "name": "photoUrl" } }
+				},
+				"tags": {
+					"type": "array",
+					"xml": { "wrapped": true },
+					"items": { "xml": { "name": "tag" }, "$ref": "#/definitions/Tag" }
+				},
+				"status": {
+					"type": "string",
+					"description": "pet status in the store",
+					"enum": ["available", "pending", "sold"]
+				}
+			},
+			"xml": { "name": "Pet" }
+		},
+		"Tag": {
+			"type": "object",
+			"properties": {
+				"id": { "type": "integer", "format": "int64" },
+				"name": { "type": "string" }
+			},
+			"xml": { "name": "Tag" }
+		},
+		"Order": {
+			"type": "object",
+			"properties": {
+				"id": { "type": "integer", "format": "int64" },
+				"petId": { "type": "integer", "format": "int64" },
+				"quantity": { "type": "integer", "format": "int32" },
+				"shipDate": { "type": "string", "format": "date-time" },
+				"status": {
+					"type": "string",
+					"description": "Order Status",
+					"enum": ["placed", "approved", "delivered"]
+				},
+				"complete": { "type": "boolean" }
+			},
+			"xml": { "name": "Order" }
+		},
+		"User": {
+			"type": "object",
+			"properties": {
+				"id": { "type": "integer", "format": "int64" },
+				"username": { "type": "string" },
+				"firstName": { "type": "string" },
+				"lastName": { "type": "string" },
+				"email": { "type": "string" },
+				"password": { "type": "string" },
+				"phone": { "type": "string" },
+				"userStatus": { "type": "integer", "format": "int32", "description": "User Status" }
+			},
+			"xml": { "name": "User" }
+		}
+	},
+	"externalDocs": { "description": "Find out more about Swagger", "url": "http://swagger.io" }
+}
