@@ -4,6 +4,13 @@ CREATE TABLE "session" (
 	"expires_at" timestamp with time zone NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "todo_list" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"created_at" timestamp with time zone NOT NULL,
+	"updated_at" timestamp with time zone NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"username" text NOT NULL,
