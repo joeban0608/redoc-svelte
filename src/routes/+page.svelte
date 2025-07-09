@@ -189,6 +189,8 @@
 						</div>
 						<div class="text-xs text-gray-500">
 							<div><strong>ID:</strong> {id}</div>
+							<div><strong>origin createdAt:</strong>{todo.createdAt}</div>
+							<div><strong>origin updated:</strong>{todo.updatedAt}</div>
 							<div><strong>Created:</strong> {new Date(todo.createdAt).toLocaleString()}</div>
 							<div><strong>Updated:</strong> {new Date(todo.updatedAt).toLocaleString()}</div>
 						</div>

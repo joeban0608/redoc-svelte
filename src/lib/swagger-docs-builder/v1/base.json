@@ -1,0 +1,46 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"description": "This is a sample server Pageyai server. For this sample, you can use the api key `special-key` to test the authorization filters.",
+		"version": "0.0.1",
+		"title": "Pageyai Documentation",
+		"termsOfService": "http://localhost:5173/docs/term-of-service",
+		"contact": { "email": "jow@wows.ai" },
+		"license": { "name": "Apache 2.0", "url": "http://www.apache.org/licenses/LICENSE-2.0.html" }
+	},
+	"host": "localhost:5173",
+	"basePath": "/api",
+	"tags": [
+		{
+			"name": "todo",
+			"description": "Todo API for managing tasks and notes."
+		}
+	],
+	"schemes": ["https", "http"],
+	"securityDefinitions": {
+		"api_key": { "type": "apiKey", "name": "X-API-KEY", "in": "header" }
+	},
+	"definitions": {
+		"Pagination": {
+			"type": "object",
+			"properties": {
+				"page": { "$ref": "#/definitions/Page" },
+				"limit": { "$ref": "#/definitions/Limit" },
+				"total": { "type": "integer" }
+			}
+		},
+		"Page": {
+			"type": "integer",
+			"minimum": 1,
+			"example": 1
+		},
+		"Limit": {
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 100,
+			"default": 25,
+			"example": 20
+		}
+	},
+	"externalDocs": { "description": "Find out more about Swagger", "url": "http://swagger.io" }
+}

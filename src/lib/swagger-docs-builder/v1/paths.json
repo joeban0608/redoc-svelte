@@ -1,0 +1,54 @@
+{
+	"/todos": {
+		"get": {
+			"tags": ["todo"],
+			"summary": "Retrieve all todos",
+			"description": "Fetches a list of all todos.",
+			"operationId": "getTodos",
+			"consumes": [],
+			"produces": ["application/json"],
+			"parameters": [
+				{
+					"name": "page",
+					"in": "query",
+					"description": "The page number for pagination, optional. Must be greater than 0.",
+					"required": false,
+					"schema": { "$ref": "#/definitions/Page" }
+				},
+				{
+					"name": "limit",
+					"in": "query",
+					"description": "The maximum number of items per page, optional. Min: 1, Max: 100 (default: 25)",
+					"required": false,
+					"schema": { "$ref": "#/definitions/Limit" }
+				}
+			],
+			"responses": {
+				"200": {
+					"description": "successful get todos",
+					"schema": {
+						"type": "object",
+						"properties": {
+							"items": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": { "type": "string", "format": "uuid" },
+										"title": { "type": "string" },
+										"createdAt": { "type": "string", "format": "date-time" },
+										"updatedAt": { "type": "string", "format": "date-time" }
+									}
+								}
+							},
+							"Pagination": {
+								"$ref": "#/definitions/Pagination"
+							}
+						}
+					}
+				}
+			},
+			"security": [{ "api_key": [] }]
+		}
+	}
+}
