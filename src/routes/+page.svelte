@@ -107,13 +107,16 @@
 	<!-- todo list display -->
 	<div class="w-full max-w-md p-3 shadow">
 		<h2 class="mb-4 text-2xl font-bold text-gray-800">Todo List Items</h2>
-		<div class="mb-4 flex items-center justify-between text-gray-600">
-			<div class="flex items-center gap-4">
-				<span>
-					Total: {total} items
-				</span>
-				<label class="flex items-center gap-1">
-					<span>Limit:</span>
+		<!-- 分頁資訊與操作 -->
+		<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+			<div class="flex flex-wrap items-center gap-5 text-base text-gray-700">
+				<p class="flex items-center gap-2">
+					<strong>Total: </strong>
+					<span class="rounded bg-gray-200 px-2 py-1">{total} items</span>
+				</p>
+
+				<div class="flex items-center gap-2">
+					<strong>Limit:</strong>
 					<select
 						bind:value={limit}
 						class="w-12 rounded border border-gray-300 px-2 py-1 focus:border-blue-500 focus:outline-none"
@@ -122,25 +125,36 @@
 							await loadTodos();
 						}}
 					>
-						<option value="1">1</option>
-						<option value="5">5</option>
-						<option value="10">10</option>
-						<option value="20">20</option>
-						<option value="50">50</option>
+						<option value={1}>1</option>
+						<option value={5}>5</option>
+						<option value={10}>10</option>
+						<option value={20}>20</option>
 					</select>
-				</label>
-				<span>Page: {page}</span>
+				</div>
+
+				<p class="flex items-center gap-2">
+					<strong>Page:</strong>
+					<span class="rounded bg-gray-200 px-2 py-1">{page}</span>
+				</p>
 			</div>
 
-			<div class="mb-4 flex gap-4">
+			<div class="flex gap-2">
 				<button
 					onclick={previousPage}
-					class="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400">{'<'}</button
+					class="rounded border border-gray-300 bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+					disabled={page <= 1}
+					aria-label="Previous Page"
 				>
+					&lt;
+				</button>
 				<button
 					onclick={nextPage}
-					class="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400">{'>'}</button
+					class="rounded border border-gray-300 bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+					disabled={page * limit >= total}
+					aria-label="Next Page"
 				>
+					&gt;
+				</button>
 			</div>
 		</div>
 		<!-- page next , page previous -->
