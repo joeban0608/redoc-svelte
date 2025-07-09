@@ -5,16 +5,36 @@
 	import { onMount } from 'svelte';
 
 	let title = $state('');
-	let todos: FetcherResponse<'GET /api/todos'> = $state([]);
+	let todos: FetcherResponse<'GET /api/todos'>['items'] = $state([]);
+	let page = $state(1);
+	let limit = $state(1);
+	let total = $state(0);
 
 	async function loadTodos() {
-		const resp = await fetcher({ url: 'GET /api/todos', request: {} });
+		const resp = await fetcher({
+			url: 'GET /api/todos',
+			request: {
+				page,
+				limit
+			}
+		});
 		if (resp.status === 'error') {
 			console.error('Error fetching todos:', resp.message);
 			// toast.error(m.error_fetching_data({ message: resp.message }));
 			return;
 		}
-		todos = resp.data;
+		todos = resp.data.items; // Assuming the response has a data property with items
+		total = resp.data.pagination.total; // Assuming the response has a total property
+	}
+	async function nextPage() {
+		if (page * limit >= total) return; // No more items to load
+		page += 1;
+		await loadTodos();
+	}
+	async function previousPage() {
+		if (page <= 1) return; // Already on the first page
+		page -= 1;
+		await loadTodos();
 	}
 
 	async function createTodo() {
@@ -83,11 +103,48 @@
 			Add Todo
 		</button>
 	</form>
-	<!-- todo list form end -->
+
 	<!-- todo list display -->
-	{#if todos?.length}
-		<div class="w-full max-w-md p-3 shadow">
-			<h2 class="mb-4 text-2xl font-bold text-gray-800">Todo List Items</h2>
+	<div class="w-full max-w-md p-3 shadow">
+		<h2 class="mb-4 text-2xl font-bold text-gray-800">Todo List Items</h2>
+		<div class="mb-4 flex items-center justify-between text-gray-600">
+			<div class="flex items-center gap-4">
+				<span>
+					Total: {total} items
+				</span>
+				<label class="flex items-center gap-1">
+					<span>Limit:</span>
+					<select
+						bind:value={limit}
+						class="w-12 rounded border border-gray-300 px-2 py-1 focus:border-blue-500 focus:outline-none"
+						onchange={async () => {
+							page = 1; // Reset to first page when limit changes
+							await loadTodos();
+						}}
+					>
+						<option value="1">1</option>
+						<option value="5">5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+					</select>
+				</label>
+				<span>Page: {page}</span>
+			</div>
+
+			<div class="mb-4 flex gap-4">
+				<button
+					onclick={previousPage}
+					class="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400">{'<'}</button
+				>
+				<button
+					onclick={nextPage}
+					class="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400">{'>'}</button
+				>
+			</div>
+		</div>
+		<!-- page next , page previous -->
+		{#if todos?.length}
 			<ul class="space-y-4">
 				{#each todos as todo (todo.id)}
 					{@const id = todo.id}
@@ -124,7 +181,6 @@
 					</li>
 				{/each}
 			</ul>
-		</div>
-	{/if}
-	<!-- todo list display end -->
+		{/if}
+	</div>
 </main>
