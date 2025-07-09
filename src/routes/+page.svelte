@@ -1,83 +1,48 @@
 <script lang="ts">
 	import { PUBLIC_ORIGIN } from '$env/static/public';
-	import type { TodoList } from '$lib/server/db/schema';
+	import fetcher from '$lib/fetcher';
+	import type { FetcherResponse } from '$lib/type';
 	import { onMount } from 'svelte';
 
 	let title = $state('');
-	let todos: TodoList[] = $state([]);
+	let todos: FetcherResponse<'GET /api/todos'> = $state([]);
 
 	async function loadTodos() {
-		const res = await fetch(`${PUBLIC_ORIGIN}/api/todos`);
-		if (res.ok) {
-			const todosRes = await res.json();
-			console.log('Todos loaded:', todosRes);
-			todos = todosRes; // Update the todos state with the fetched data
-		} else {
-			console.error('Error loading todos:', await res.text());
-			todos = [];
+		const resp = await fetcher({ url: 'GET /api/todos', request: {} });
+		if (resp.status === 'error') {
+			console.error('Error fetching todos:', resp.message);
+			// toast.error(m.error_fetching_data({ message: resp.message }));
+			return;
 		}
+		todos = resp.data;
 	}
 
 	async function createTodo() {
-		try {
-			const res = await fetch(`${PUBLIC_ORIGIN}/api/todo`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					title
-				})
-			});
-			const data = await res.json();
-			if (!res.ok) {
-				throw new Error(data.message || 'Failed to create todo');
-			}
-			console.log('Todo created:', data);
-			todos = [...todos, data]; // Add the new todo to the state
-		} catch (error) {
-			console.error('Error creating todo:', error);
+		const resp = await fetcher({ url: 'POST /api/todo', request: { title } });
+		if (resp.status === 'error') {
+			console.error('Error create todo:', resp.message);
+			return;
 		}
+		todos = [...todos, resp.data]; // Add the new todo to the state
 		title = ''; // Clear the input field even if there's an error
 	}
 
 	async function deleteTodo(id: string) {
-		try {
-			const res = await fetch(`${PUBLIC_ORIGIN}/api/todo`, {
-				method: 'DELETE',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ id })
-			});
-			if (!res.ok) {
-				throw new Error('Failed to delete todo');
-			}
-			console.log('Todo deleted:', id);
-			todos = todos.filter((todo) => todo.id !== id); // Remove the deleted todo from the state
-		} catch (error) {
-			console.error('Error deleting todo:', error);
+		const resp = await fetcher({ url: 'DELETE /api/todo', request: { id } });
+		if (resp.status === 'error') {
+			console.error('Error deleting todo:', resp.message);
+			return;
 		}
+		todos = todos.filter((todo) => todo.id !== id); // Remove the deleted todo from the state
 	}
 
 	async function updateTodo(id: string, newTitle: string) {
-		try {
-			const res = await fetch(`${PUBLIC_ORIGIN}/api/todo`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ id, title: newTitle })
-			});
-			const data = await res.json();
-			if (!res.ok) {
-				throw new Error(data.message || 'Failed to update todo');
-			}
-			console.log('Todo updated:', data);
-			todos = todos.map((todo) => (todo.id === id ? { ...todo, title: newTitle } : todo));
-		} catch (error) {
-			console.error('Error updating todo:', error);
+		const resp = await fetcher({ url: 'PUT /api/todo', request: { id, title: newTitle } });
+		if (resp.status === 'error') {
+			console.error('Error updating todo:', resp.message);
+			return;
 		}
+		todos = todos.map((todo) => (todo.id === id ? { ...todo, title: newTitle } : todo));
 	}
 
 	onMount(() => {
