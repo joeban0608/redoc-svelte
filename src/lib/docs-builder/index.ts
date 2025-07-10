@@ -77,7 +77,7 @@ export async function docsBuilder() {
 				method: method.toLowerCase() as 'get' | 'post' | 'put' | 'delete',
 				path: path,
 				summary: path,
-				tags: formatTags(path),
+				tags: [formatTags(path).join('-')],
 				description: item.description,
 				request: {
 					params: item.request ? item.request : undefined
@@ -98,7 +98,7 @@ export async function docsBuilder() {
 				method: method.toLowerCase() as 'get' | 'post' | 'put' | 'delete',
 				path: path,
 				summary: path,
-				tags: formatTags(path),
+				tags: [formatTags(path).join('-')],
 				description: item.description,
 				request: {
 					body: {
