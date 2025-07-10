@@ -26,7 +26,7 @@ export class DocBuilder {
 		const parts = path.split('/').filter(Boolean);
 		return parts[0] === 'api' ? parts.slice(1) : parts;
 	}
-	static registerPath(_schema: typeof schema) {
+	static registerPathFromSchema(_schema: typeof schema) {
 		Object.entries(_schema).forEach(([key, item]) => {
 			const [method, path] = key.split(' ');
 			if (method === 'GET') {
@@ -123,7 +123,7 @@ export class DocBuilder {
 export async function docsBuilder() {
 	await DocBuilder.init();
 
-	await DocBuilder.registerPath(schema);
+	await DocBuilder.registerPathFromSchema(schema);
 
 	await DocBuilder.writeDocToFile();
 }
