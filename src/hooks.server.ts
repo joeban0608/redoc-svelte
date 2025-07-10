@@ -1,6 +1,9 @@
 import type { Handle, ServerInit } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth';
-import { swaggerDocBuilding } from '$lib/swagger-docs-builder';
+import { docsBuilder } from '$lib/docs-builder';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import { db } from '$lib/server/db';
+import path from 'path';
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get(auth.sessionCookieName);
@@ -29,7 +32,8 @@ export const handle: Handle = handleAuth;
 function hookInit(): ServerInit {
 	return async () => {
 		try {
-			await swaggerDocBuilding();
+			await migrate(db, { migrationsFolder: path.resolve('.') + '/drizzle' });
+			await docsBuilder();
 		} catch (error) {
 			console.error('Server initialization error:', error);
 			process.exit(1);
