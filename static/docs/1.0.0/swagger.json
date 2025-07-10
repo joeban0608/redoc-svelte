@@ -4,116 +4,288 @@
     "title": "My API",
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "http://localhost:5173/api",
+      "description": "host server"
+    },
+    {
+      "url": "http://localhost:5173/api",
+      "description": "Local development server"
+    }
+  ],
   "components": {
-    "schemas": {
-      "TodoListResponse": {
-        "type": "object",
-        "properties": {
-          "pagination": {
-            "type": "object",
-            "properties": {
-              "page": {
-                "type": "number",
-                "description": "The current page number."
-              },
-              "limit": {
-                "type": "number",
-                "description": "The number of items per page."
-              },
-              "total": {
-                "type": "number",
-                "description": "The total number of items."
-              }
-            },
-            "required": [
-              "page",
-              "limit",
-              "total"
-            ]
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string"
+    "schemas": {},
+    "parameters": {}
+  },
+  "paths": {
+    "/api/todos": {
+      "get": {
+        "summary": "/api/todos",
+        "tags": [
+          "todos"
+        ],
+        "description": "Fetches a specific site by its unique identifier.",
+        "parameters": [
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d+$"
                 },
-                "title": {
-                  "type": "string"
-                },
-                "createdAt": {
-                  "type": "string"
-                },
-                "updatedAt": {
-                  "type": "string"
+                {
+                  "type": "integer"
                 }
-              },
-              "required": [
-                "id",
-                "title",
-                "createdAt",
-                "updatedAt"
-              ]
-            }
-          }
-        },
-        "required": [
-          "pagination",
-          "items"
-        ]
-      },
-      "TodoListRequest": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "anyOf": [
-              {
-                "type": "string",
-                "pattern": "^\\d+$"
-              },
-              {
-                "type": "integer"
-              }
-            ],
-            "description": "The page number for pagination, optional. Must be greater than 0."
+              ],
+              "description": "The page number for pagination, optional. Must be greater than 0."
+            },
+            "required": false,
+            "description": "The page number for pagination, optional. Must be greater than 0.",
+            "name": "page",
+            "in": "path"
           },
-          "limit": {
-            "anyOf": [
-              {
-                "type": "string",
-                "pattern": "^\\d+$"
-              },
-              {
-                "type": "integer"
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^\\d+$"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "description": "The maximum number of items per page, optional. Min: 1, Max: 100 (default: 25)"
+            },
+            "required": false,
+            "description": "The maximum number of items per page, optional. Min: 1, Max: 100 (default: 25)",
+            "name": "limit",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "number",
+                          "description": "The current page number."
+                        },
+                        "limit": {
+                          "type": "number",
+                          "description": "The number of items per page."
+                        },
+                        "total": {
+                          "type": "number",
+                          "description": "The total number of items."
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "limit",
+                        "total"
+                      ]
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          },
+                          "updatedAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "createdAt",
+                          "updatedAt"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "pagination",
+                    "items"
+                  ]
+                }
               }
-            ],
-            "description": "The maximum number of items per page, optional. Min: 1, Max: 100 (default: 25)"
+            }
           }
         }
       }
     },
-    "parameters": {}
-  },
-  "paths": {
-    "/todos": {
+    "/api/todo": {
       "post": {
+        "summary": "/api/todo",
+        "tags": [
+          "todo"
+        ],
+        "description": "Creates a new todo item.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TodoListRequest"
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "title"
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Success response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TodoListResponse"
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "/api/todo",
+        "tags": [
+          "todo"
+        ],
+        "description": "Updates an existing todo item.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "id",
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "/api/todo",
+        "tags": [
+          "todo"
+        ],
+        "description": "Deletes a todo item by its unique identifier.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
