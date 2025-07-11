@@ -109,7 +109,7 @@ export class DocBuilder {
 				fs.mkdirSync(destDir, { recursive: true });
 			}
 
-			fs.writeFileSync(path.join(destDir, 'swagger.json'), JSON.stringify(doc, null, 2));
+			fs.writeFileSync(path.join(destDir, 'openApi.json'), JSON.stringify(doc, null, 2));
 		} catch (error) {
 			console.error('Failed to write OpenAPI document:', error);
 			throw error;
