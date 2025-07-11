@@ -12,7 +12,7 @@ export class DocBuilder {
 		title: 'XXX API Documentation'
 	};
 
-	private static registry: OpenAPIRegistry = new OpenAPIRegistry();
+	static registry: OpenAPIRegistry = new OpenAPIRegistry();
 
 	private static formatTags(path: string): string[] {
 		const parts = path.split('/').filter(Boolean);
@@ -20,6 +20,11 @@ export class DocBuilder {
 	}
 
 	static registerPathFromSchema(_schema: typeof schema): void {
+		const apiKeyAuth = DocBuilder.registry.registerComponent('securitySchemes', 'ApiKeyAuth', {
+			type: 'apiKey',
+			in: 'header',
+			name: 'X-API-Key'
+		});
 		Object.entries(_schema).forEach(([key, item]) => {
 			const [method, path] = key.split(' ');
 			const httpMethod = method.toLowerCase() as 'get' | 'post' | 'put' | 'delete';
@@ -31,6 +36,7 @@ export class DocBuilder {
 				summary: path,
 				tags: [tag],
 				description: item.description,
+				security: [{ [apiKeyAuth.name]: [] }],
 				responses: {
 					200: {
 						description: 'Success response',
